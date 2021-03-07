@@ -1,0 +1,13 @@
+Index: RPi.GPIO-0.7.0/setup.py
+===================================================================
+--- RPi.GPIO-0.7.0.orig/setup.py
++++ RPi.GPIO-0.7.0/setup.py
+@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWAR
+ SOFTWARE.
+ """
+ 
+-from distutils.core import setup, Extension
++from setuptools import setup, Extension
+ 
+ classifiers = ['Development Status :: 5 - Production/Stable',
+                'Operating System :: POSIX :: Linux',

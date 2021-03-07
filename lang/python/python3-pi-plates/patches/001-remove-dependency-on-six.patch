@@ -1,0 +1,105 @@
+Index: pi-plates-7.1/piplates/DAQC2plate.py
+===================================================================
+--- pi-plates-7.1.orig/piplates/DAQC2plate.py
++++ pi-plates-7.1/piplates/DAQC2plate.py
+@@ -5,7 +5,6 @@ import site
+ import sys
+ from numbers import Number
+ import RPi.GPIO as GPIO
+-from six.moves import input as raw_input
+ GPIO.setwarnings(False)
+ 
+ #Initialize
+@@ -63,7 +62,7 @@ def help():
+                     print (s[:len(s)-1])
+                     Count = Count + 1
+                     if (Count==20):
+-                        Input=raw_input('press \"Enter\" for more...')                        
++                        Input=input('press \"Enter\" for more...')                        
+                 else:
+                     Count=100
+                     valid=False
+Index: pi-plates-7.1/piplates/DAQCplate.py
+===================================================================
+--- pi-plates-7.1.orig/piplates/DAQCplate.py
++++ pi-plates-7.1/piplates/DAQCplate.py
+@@ -4,7 +4,6 @@ import string
+ import site
+ import sys
+ import RPi.GPIO as GPIO
+-from six.moves import input as raw_input
+ GPIO.setwarnings(False)
+ 
+ #Initialize
+@@ -53,7 +52,7 @@ def help():
+                     print (s[:len(s)-1])
+                     Count = Count + 1
+                     if (Count==20):
+-                        Input=raw_input('press \"Enter\" for more...')                        
++                        Input=input('press \"Enter\" for more...')                        
+                 else:
+                     Count=100
+                     valid=False
+Index: pi-plates-7.1/piplates/MOTORplate.py
+===================================================================
+--- pi-plates-7.1.orig/piplates/MOTORplate.py
++++ pi-plates-7.1/piplates/MOTORplate.py
+@@ -5,7 +5,6 @@ import site
+ import sys
+ from numbers import Number
+ import RPi.GPIO as GPIO
+-from six.moves import input as raw_input
+ GPIO.setwarnings(False)
+ 
+ #Initialize
+@@ -53,7 +52,7 @@ def help():
+                     print(s[:len(s)-1])
+                     Count = Count + 1
+                     if (Count==20):
+-                        Input=raw_input('press \"Enter\" for more...')                        
++                        Input=input('press \"Enter\" for more...')                        
+                 else:
+                     Count=100
+                     valid=False
+Index: pi-plates-7.1/piplates/RELAYplate.py
+===================================================================
+--- pi-plates-7.1.orig/piplates/RELAYplate.py
++++ pi-plates-7.1/piplates/RELAYplate.py
+@@ -5,7 +5,6 @@ import site
+ import sys
+ from numbers import Number
+ import RPi.GPIO as GPIO
+-from six.moves import input as raw_input
+ 
+ GPIO.setwarnings(False)
+ 
+@@ -56,7 +55,7 @@ def help():
+                     print (s[:len(s)-1])
+                     Count = Count + 1
+                     if (Count==20):
+-                        Input=raw_input('press \"Enter\" for more...')                        
++                        Input=input('press \"Enter\" for more...')                        
+                 else:
+                     Count=100
+                     valid=False
+Index: pi-plates-7.1/piplates/THERMOplate.py
+===================================================================
+--- pi-plates-7.1.orig/piplates/THERMOplate.py
++++ pi-plates-7.1/piplates/THERMOplate.py
+@@ -6,7 +6,6 @@ import sys
+ import math
+ from numbers import Number
+ import RPi.GPIO as GPIO
+-from six.moves import input as raw_input
+ GPIO.setwarnings(False)
+ 
+ #Initialize
+@@ -97,7 +96,7 @@ def help():
+                     print (s[:len(s)-1])
+                     Count = Count + 1
+                     if (Count==20):
+-                        Input=raw_input('press \"Enter\" for more...')                        
++                        Input=input('press \"Enter\" for more...')                        
+                 else:
+                     Count=100
+                     valid=False
