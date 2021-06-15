@@ -12,9 +12,10 @@ A lot of people already use adblocker plugins within their desktop browsers, but
 | :------------------ | :-----: | :--- | :--------------- | :-------------------------------------------------------------------------------- |
 | adaway              | x       | S    | mobile           | [Link](https://github.com/AdAway/adaway.github.io)                                |
 | adguard             | x       | L    | general          | [Link](https://adguard.com)                                                       |
-| anti_ad             |         | L    | compilation      | [Link](https://github.com/privacy-protection-tools/anti-AD/blob/master/README.md) |
+| adguard_tracking    |         | S    | tracking         | [Link](https://github.com/AdguardTeam/cname-trackers)                             |
 | android_tracking    |         | S    | tracking         | [Link](https://github.com/Perflyst/PiHoleBlocklist)                               |
 | andryou             |         | L    | compilation      | [Link](https://gitlab.com/andryou/block/-/blob/master/readme.md)                  |
+| anti_ad             |         | L    | compilation      | [Link](https://github.com/privacy-protection-tools/anti-AD/blob/master/README.md) |
 | anudeep             |         | M    | compilation      | [Link](https://github.com/anudeepND/blacklist)                                    |
 | bitcoin             |         | S    | mining           | [Link](https://github.com/hoshsadiq/adblock-nocoin-list)                          |
 | disconnect          | x       | S    | general          | [Link](https://disconnect.me)                                                     |
@@ -61,11 +62,13 @@ A lot of people already use adblocker plugins within their desktop browsers, but
     • <b>S</b> (-10k), <b>M</b> (10k-30k) and <b>L</b> (30k-80k) should work for 128 MByte devices,  
     • <b>XL</b> (80k-200k) should work for 256-512 MByte devices,  
     • <b>XXL</b> (200k-) needs more RAM and Multicore support, e.g. x86 or raspberry devices.  
+    • <b>VAR</b> (50k-500k) variable size depending on the selection.  
 * Zero-conf like automatic installation & setup, usually no manual changes needed
 * Simple but yet powerful adblock engine: adblock does not use error prone external iptables rulesets, http pixel server instances and things like that
 * Supports five different DNS backend formats: dnsmasq, unbound, named (bind), kresd or raw (e.g. used by dnscrypt-proxy)
 * Supports four different SSL-enabled download utilities: uclient-fetch, wget, curl or aria2c
 * Supports SafeSearch for google, bing, duckduckgo, yandex, youtube and pixabay
+* Supports RPZ-trigger 'RPZ-CLIENT-IP' to always allow/deny certain DNS clients based on their IP address (currently only supported by bind dns backend)
 * Fast downloads & list processing as they are handled in parallel running background jobs with multicore support
 * Supports a wide range of router modes, even AP modes are supported
 * Full IPv4 and IPv6 support
@@ -145,7 +148,8 @@ Available commands:
 | adb_srcfile        | -, /tmp/adb_sources.json           | full path to the used adblock source file, which has a higher precedence than the archive file |
 | adb_dns            | -, auto-detected                   | 'dnsmasq', 'unbound', 'named', 'kresd' or 'raw'                                                |
 | adb_fetchutil      | -, auto-detected                   | 'uclient-fetch', 'wget', 'curl' or 'aria2c'                                                    |
-| adb_fetchparm      | -, auto-detected                   | config options for the selected download utility, e.g. to disable the certificate check        |
+| adb_fetchparm      | -, auto-detected                   | manually override the config options for the selected download utility                         |
+| adb_fetchinsecure  | 0, disabled                        | don't check SSL server certificates during download                                            |
 | adb_trigger        | -, not set                         | trigger network interface or 'not set' to use a time-based startup                             |
 | adb_triggerdelay   | 2                                  | additional trigger delay in seconds before adblock processing begins                           |
 | adb_debug          | 0, disabled                        | set to 1 to enable the debug output                                                            |
@@ -157,7 +161,7 @@ Available commands:
 | adb_dnsinstance    | 0, first instance                  | set to the relevant dns backend instance used by adblock (dnsmasq only)                        |
 | adb_dnsflush       | 0, disabled                        | set to 1 to flush the DNS Cache before & after adblock processing                              |
 | adb_dnsinotify     | -, not set                         | set to 1 to prevent adblock triggered restarts for DNS backends with autoload functions        |
-| adb_dnsallow       | -, not set                         | set to 1 to disable selective DNS whitelisting (RPZ pass through)                              |
+| adb_dnsallow       | -, not set                         | set to 1 to disable selective DNS whitelisting (RPZ-PASSTHRU)                                  |
 | adb_lookupdomain   | example.com                        | external domain to check for a successful DNS backend restart or 'false' to disable this check |
 | adb_portlist       | 53 853 5353                        | space separated list of firewall ports which should be redirected locally                      |
 | adb_report         | 0, disabled                        | set to 1 to enable the background tcpdump gathering process for reporting                      |
@@ -183,11 +187,12 @@ Available commands:
 
 ## Examples
 **Change the DNS backend to 'unbound':**  
-No further configuration is needed, adblock deposits the final blocklist 'adb_list.overall' in '/var/lib/unbound' by default.
+No further configuration is needed, adblock deposits the final blocklist 'adb_list.overall' in '/var/lib/unbound' by default.  
+To preserve the DNS cache after adblock processing please install the additional package 'unbound-control'.
 
-**Change the DNS backend to 'named' (bind):**  
-Adblock deposits the final blocklist 'adb_list.overall' in '/var/lib/bind'.  
-To preserve the DNS cache after adblock processing you need to install & configure 'bind-rdnc'.  
+**Change the DNS backend to 'bind':**  
+Adblock deposits the final blocklist 'adb_list.overall' in '/var/lib/bind' by default.  
+To preserve the DNS cache after adblock processing please install the additional package 'bind-rdnc'.
 To use the blocklist please modify '/etc/bind/named.conf':
 <pre><code>
 in the 'options' namespace add:
@@ -205,6 +210,18 @@ and at the end of the file add:
 **Change the DNS backend to 'kresd':**  
 Adblock deposits the final blocklist 'adb_list.overall' in '/etc/kresd', no further configuration needed.  
 <b>Please note:</b> The knot-resolver (kresd) is only available on Turris devices and does not support the SafeSearch functionality yet.
+
+**Use restrictive jail modes:**  
+You can enable a restrictive 'adb_list.jail' to block access to all domains except those listed in the whitelist file. Usually this list will be generated as an additional list for guest or kidsafe configurations (for a separate dns server instance). If the jail directory points to your primary dns directory, adblock enables the restrictive jail mode automatically (jail mode only).
+
+**Manually override the download options:**  
+By default adblock uses the following pre-configured download options:  
+* aria2c: <code>--timeout=20 --allow-overwrite=true --auto-file-renaming=false --log-level=warn --dir=/ -o</code>
+* curl: <code>--connect-timeout 20 --silent --show-error --location -o</code>
+* uclient-fetch: <code>--timeout=20 -O</code>
+* wget: <code>--no-cache --no-cookies --max-redirect=0 --timeout=20 -O</code>
+
+To override the default set 'adb_fetchparm' manually to your needs.
 
 **Enable E-Mail notification via 'msmtp':**  
 To use the email notification you have to install & configure the package 'msmtp'.  
